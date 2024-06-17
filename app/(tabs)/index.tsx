@@ -1,31 +1,44 @@
-import { StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from "react-native";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import EditScreenInfo from "@/components/EditScreenInfo";
+import { Text, View } from "@/components/Themed";
+import Pin from "@/components/Pin";
+import MasonryList from "@/components/MasonryList";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 export default function TabOneScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
-  );
+  const [pins, setPins] = useState([]);
+  async function fetchData() {
+    const { data, error } = await supabase.from("pins").select("*");
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(
+        // data.map((pin) => ({
+        //   id: pin.id,
+        //   title: pin.title,
+        //   image: pin.image,
+        // }))
+        setPins(data)
+      );
+    }
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  return <MasonryList pins={pins} />;
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    padding: 10,
+    flexDirection: "row",
   },
   separator: {
     marginVertical: 30,
     height: 1,
-    width: '80%',
+    width: "80%",
   },
 });
